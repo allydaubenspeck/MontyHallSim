@@ -69,6 +69,7 @@
 
     <div class="score-board">
         <p>Score: <span id="score">0</span></p>
+        <p>Total Games Played: <span id="total-games">0</span></p>
         <button id="play-again" class="hidden" onclick="playAgain()">Play Again</button>
     </div>
 
@@ -77,6 +78,7 @@
         let userChoice = null;
         let revealedDoor = null;
         let score = 0;
+        let totalGames = 0;
 
         function setupGame() {
             doors = ["ZONK", "ZONK", "CAR!"];
@@ -138,7 +140,9 @@
                 score++;
             }
 
+            totalGames++;
             document.getElementById("score").textContent = score;
+            document.getElementById("total-games").textContent = totalGames;
             document.getElementById("play-again").classList.remove("hidden");
             document.getElementById("decision-buttons").classList.add("hidden");
         }
