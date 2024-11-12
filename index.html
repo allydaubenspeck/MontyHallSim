@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monty Hall Problem Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .door-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .door {
+            width: 100px;
+            height: 150px;
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid gray;
+            border-radius: 5px;
+        }
+        .door.revealed {
+            background-color: #ffcccc;
+            cursor: not-allowed;
+        }
+        .door.car {
+            background-color: #ccffcc;
+        }
+        .score-board {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .button-container {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monty Hall Problem Simulation</h1>
+    <p>Pick a door, then decide to switch or keep your choice after a ZONK door is revealed.</p>
+
+    <div class="door-container">
+        <div id="door1" class="door" onclick="selectDoor(1)">Door 1</div>
+        <div id="door2" class="door" onclick="selectDoor(2)">Door 2</div>
+        <div id="door3" class="door" onclick="selectDoor(3)">Door 3</div>
+    </div>
+
+    <div class="button-container hidden" id="decision-buttons">
+        <button onclick="keepChoice()">Keep Choice</button>
+        <button onclick="switchChoice()">Switch Choice</button>
+    </div>
+
+    <div class="score-board">
+        <p>Score: <span id="score">0</span></p>
+        <button id="play-again" class="hidden" onclick="playAgain()">Play Again</button>
+    </div>
+
+    <script>
+        let doors = [];
+        let userChoice = null;
+        let revealedDoor = null;
+        let score = 0;
+
+        function setupGame() {
+            doors = ["ZONK", "ZONK", "CAR!"];
+            doors = doors.sort(() => Math.random() - 0.5); // Shuffle doors
+            userChoice = null;
+            revealedDoor = null;
+
+            document.querySelectorAll(".door").forEach((door, index) => {
+                door.textContent = `Door ${index + 1}`;
+                door.classList.remove("revealed", "car");
+                door.style.cursor = "pointer";
+                door.onclick = () => selectDoor(index + 1);
+            });
+
+            document.getElementById("decision-buttons").classList.add("hidden");
+            document.getElementById("play-again").classList.add("hidden");
+        }
+
+        function selectDoor(doorNumber) {
+            if (userChoice !== null) return;
+            userChoice = doorNumber;
+
+            revealZonk();
+            document.getElementById("decision-buttons").classList.remove("hidden");
+        }
+
+        function revealZonk() {
+            for (let i = 0; i < doors.length; i++) {
+                if (i + 1 !== userChoice && doors[i] === "ZONK") {
+                    revealedDoor = i + 1;
+                    document.getElementById(`door${revealedDoor}`).textContent = "ZONK";
+                    document.getElementById(`door${revealedDoor}`).classList.add("revealed");
+                    break;
+                }
+            }
+        }
+
+        function keepChoice() {
+            endRound(userChoice);
+        }
+
+        function switchChoice() {
+            for (let i = 1; i <= 3; i++) {
+                if (i !== userChoice && i !== revealedDoor) {
+                    endRound(i);
+                    break;
+                }
+            }
+        }
+
+        function endRound(finalChoice) {
+            document.querySelectorAll(".door").forEach((door, index) => {
+                door.textContent = doors[index];
+                door.classList.add(doors[index] === "CAR!" ? "car" : "revealed");
+                door.onclick = null;
+            });
+
+            if (doors[finalChoice - 1] === "CAR!") {
+                score++;
+            }
+
+            document.getElementById("score").textContent = score;
+            document.getElementById("play-again").classList.remove("hidden");
+            document.getElementById("decision-buttons").classList.add("hidden");
+        }
+
+        function playAgain() {
+            setupGame();
+        }
+
+        setupGame();
+    </script>
+</body>
+</html>
